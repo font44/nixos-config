@@ -64,9 +64,13 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    claude-code
     obsidian
     signal-desktop
     vscode
+
+    # Could remove the following if I use development environments or something for my personal coding projects
+    uv
   ];
 
   system.stateVersion = "25.05";
