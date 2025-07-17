@@ -51,17 +51,21 @@
     isNormalUser = true;
     description = "Ketan Vijayvargiya";
     extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.zsh;
   };
   security.sudo.wheelNeedsPassword = false;
 
-programs.firefox = {
-  enable = true;
-  package = pkgs.librewolf;
-};
+  programs.firefox = {
+    enable = true;
+    package = pkgs.librewolf;
+  };
+  programs.zsh.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    obsidian
+    signal-desktop
     vscode
   ];
 

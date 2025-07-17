@@ -14,5 +14,10 @@
     neovim
   ];
 
+  programs.zsh = {
+    enable = true;
+    syntaxHighlighting.enable = true;
+  };
+
   home.stateVersion = "25.05";
 }
