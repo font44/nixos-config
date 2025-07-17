@@ -33,6 +33,11 @@
   };
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  nix.optimise = {
+    automatic = true;
+    persistent = true;
+  };
+
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
