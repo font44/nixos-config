@@ -59,17 +59,22 @@
     enable = true;
     package = pkgs.librewolf;
   };
+  programs.kdeconnect.enable = true;
   programs.zsh.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    btop
     claude-code
+    hugo
+    jq
     obsidian
     signal-desktop
     vscode
 
     # Could remove the following if I use development environments or something for my personal coding projects
+    ruff
     uv
   ];
 
