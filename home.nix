@@ -9,6 +9,9 @@
     userEmail = "hi@ketanvijayvargiya.com";
     userName = "Ketan Vijayvargiya";
   };
+  programs.firefox = {
+    enable = true;
+  };
   programs.neovim = {
     enable = true;
     defaultEditor = true;

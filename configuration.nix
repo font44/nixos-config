@@ -38,20 +38,18 @@
     persistent = true;
   };
 
-  services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
-
+  services.displayManager.sddm.enable = true;
   services.printing.enable = true;
-
   services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
   };
-
+  security.rtkit.enable = true;
+  
   users.users.ketan = {
     isNormalUser = true;
     description = "Ketan Vijayvargiya";
@@ -60,11 +58,8 @@
   };
   security.sudo.wheelNeedsPassword = false;
 
-  programs.firefox = {
-    enable = true;
-    package = pkgs.librewolf;
-  };
   programs.kdeconnect.enable = true;
+  programs.partition-manager.enable = true;
   programs.zsh.enable = true;
 
   nixpkgs.config.allowUnfree = true;
