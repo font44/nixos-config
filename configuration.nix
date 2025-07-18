@@ -74,6 +74,7 @@
     vscode
 
     # Could remove the following if I use development environments or something for my personal coding projects
+    python312
     ruff
     uv
   ];

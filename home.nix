@@ -12,6 +12,10 @@
   programs.firefox = {
     enable = true;
   };
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
   programs.neovim = {
     enable = true;
     defaultEditor = true;
