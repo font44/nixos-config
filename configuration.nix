@@ -32,6 +32,7 @@
     LC_TIME = "en_US.UTF-8";
   };
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.trusted-users = [ "root" "ketan" ];
 
   nix.optimise = {
     automatic = true;
@@ -67,11 +68,14 @@
   environment.systemPackages = with pkgs; [
     btop
     claude-code
+    devenv
     hugo
     jq
+    libreoffice
     obsidian
     signal-desktop
     vscode
+    zoom-us
 
     # Could remove the following if I use development environments or something for my personal coding projects
     python312

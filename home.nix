@@ -4,6 +4,10 @@
   home.username = "ketan";
   home.homeDirectory = "/home/ketan";
 
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+  };
   programs.git = {
     enable = true;
     userEmail = "hi@ketanvijayvargiya.com";
