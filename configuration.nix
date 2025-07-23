@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, inputs, pkgs, ... }:
 
 {
   imports =
@@ -31,8 +31,11 @@
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.settings.trusted-users = [ "root" "ketan" ];
+
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "root" "ketan" ];
+  };
 
   nix.optimise = {
     automatic = true;
@@ -54,7 +57,7 @@
   users.users.ketan = {
     isNormalUser = true;
     description = "Ketan Vijayvargiya";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "docker" "networkmanager" "wheel" ];
     shell = pkgs.zsh;
   };
   security.sudo.wheelNeedsPassword = false;
@@ -76,13 +79,11 @@
     signal-desktop
     vscode
     zoom-us
-
-    # Could remove the following if I use development environments or something for my personal coding projects
-    python312
-    ruff
-    uv
   ];
 
-  system.stateVersion = "25.05";
+  virtualisation.docker = {
+    enable = true;
+  };
 
+  system.stateVersion = "25.05";
 }
