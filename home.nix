@@ -36,7 +36,7 @@
 
   services.syncthing = {
     enable = true;
-    overrideDevices = true;
+    overrideFolders = false;
     settings.devices = {
       "f02aa75af4c0" = {
         id = "NIULDNJ-WZLFXF6-B2CFGL3-OXC6KXH-GDRXXTH-FIRCQTE-Q6XVEFY-46GGAQS";

@@ -1,4 +1,4 @@
-{ config, inputs, pkgs, ... }:
+{ config, inputs, pkgs, pkgs-unstable, ... }:
 
 {
   imports =
@@ -70,7 +70,6 @@
 
   environment.systemPackages = with pkgs; [
     btop
-    claude-code
     devenv
     hugo
     jq
@@ -79,7 +78,11 @@
     signal-desktop
     vscode
     zoom-us
-  ];
+
+  ] ++ (with pkgs-unstable; [
+    claude-code
+    gemini-cli
+  ]);
 
   virtualisation.docker = {
     enable = true;
