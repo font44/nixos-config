@@ -28,6 +28,8 @@
   };
   programs.tmux = {
     enable = true;
+    mouse = true;
+    historyLimit = 10000;
   };
   programs.zsh = {
     enable = true;

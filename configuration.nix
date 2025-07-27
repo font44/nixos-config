@@ -76,6 +76,7 @@
     libreoffice
     obsidian
     signal-desktop
+    vlc
     vscode
     zoom-us
 
