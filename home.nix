@@ -31,6 +31,9 @@
     mouse = true;
     historyLimit = 10000;
   };
+  programs.zellij = {
+    enable = true;
+  };
   programs.zsh = {
     enable = true;
     syntaxHighlighting.enable = true;

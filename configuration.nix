@@ -37,6 +37,10 @@
     trusted-users = [ "root" "ketan" ];
   };
 
+  nix.gc = {
+    automatic = true;
+    persistent = true;
+  };
   nix.optimise = {
     automatic = true;
     persistent = true;
