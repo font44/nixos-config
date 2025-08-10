@@ -1,8 +1,29 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
+  imports = [
+    inputs.sops-nix.homeManagerModules.sops
+  ];
+
   home.username = "ketan";
   home.homeDirectory = "/home/ketan";
+
+  sops = {
+    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+    
+    secrets = {
+      kubeconfig = {
+        sopsFile = ./secrets/kubeconfig.yaml;
+        path = "${config.home.homeDirectory}/.kube/config";
+        key = "";
+      };
+      talosconfig = {
+        sopsFile = ./secrets/talosconfig.yaml;
+        path = "${config.home.homeDirectory}/.talos/config";
+        key = "";
+      };
+    };
+  };
 
   programs.direnv = {
     enable = true;
