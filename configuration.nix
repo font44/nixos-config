@@ -73,6 +73,7 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    age
     btop
     devenv
     fluxcd
@@ -82,6 +83,7 @@
     libreoffice
     obsidian
     signal-desktop
+    sops
     talosctl
     vlc
     vscode
