@@ -75,11 +75,14 @@
   environment.systemPackages = with pkgs; [
     btop
     devenv
+    fluxcd
     hugo
     jq
+    kubectl
     libreoffice
     obsidian
     signal-desktop
+    talosctl
     vlc
     vscode
     zoom-us
