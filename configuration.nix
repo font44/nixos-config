@@ -58,9 +58,11 @@
   };
   security.rtkit.enable = true;
   
+  users.mutableUsers = false;
   users.users.ketan = {
     isNormalUser = true;
     description = "Ketan Vijayvargiya";
+    hashedPassword = "$y$j9T$nRWH5xd2bDz3AGt4MQa2p0$GziPLTNhiS9mSCq.Me9i8hqNqTXSNkWB4NkO4r9u6x3";  # Generate using: mkpasswd
     extraGroups = [ "docker" "networkmanager" "wheel" ];
     shell = pkgs.zsh;
   };

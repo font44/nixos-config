@@ -1,7 +1,0 @@
-keys:
-  - &yakima_ketan age1lu5jfrlxfzgm2alee73nhwf78nm8pj50nnl7jngfpqjrdxufe3rsz2w4zc
-creation_rules:
-  - path_regex: secrets/[^/]+\.yaml$
-    key_groups:
-    - age:
-      - *yakima_ketan
