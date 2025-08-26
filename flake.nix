@@ -45,7 +45,7 @@
 
       modules = [
         ./configuration.nix
-	disko.nixosModules.disko
+	inputs.disko.nixosModules.disko
 	{
 	  disko.devices = {
 	    disk = {
