@@ -43,6 +43,10 @@
     syntaxHighlighting.enable = true;
   };
 
+  home.sessionVariables = {
+    SSH_AUTH_SOCK = "${config.home.homeDirectory}/.bitwarden-ssh-agent.sock";
+  };
+
   services.copyq.enable = true;
   services.syncthing = {
     enable = true;
@@ -53,6 +57,8 @@
       };
     };
   };
+
+  xdg.configFile."crush/crush.json".source = ./crush.conf.json;
 
   home.stateVersion = "25.05";
 }

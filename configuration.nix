@@ -11,6 +11,11 @@
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+
   networking.hostName = "nixos";
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -48,6 +53,12 @@
 
   services.desktopManager.plasma6.enable = true;
   services.displayManager.sddm.enable = true;
+  services.ollama = {
+    enable = true;
+    # See https://ollama.com/library
+    loadModels = [ "gpt-oss:20b" "qwen3:30b" ];
+    acceleration = "rocm";
+  };
   services.printing.enable = true;
   services.pulseaudio.enable = false;
   services.pipewire = {
@@ -63,7 +74,7 @@
     isNormalUser = true;
     description = "Ketan Vijayvargiya";
     hashedPassword = "$y$j9T$nRWH5xd2bDz3AGt4MQa2p0$GziPLTNhiS9mSCq.Me9i8hqNqTXSNkWB4NkO4r9u6x3";  # Generate using: mkpasswd
-    extraGroups = [ "docker" "networkmanager" "wheel" ];
+    extraGroups = [ "docker" "networkmanager" "podman" "wheel" ];
     shell = pkgs.zsh;
   };
   security.sudo.wheelNeedsPassword = false;
@@ -76,6 +87,7 @@
 
   environment.systemPackages = with pkgs; [
     age
+    bitwarden-desktop
     btop
     devenv
     fluxcd
@@ -83,6 +95,7 @@
     jq
     kubectl
     libreoffice
+    nvtopPackages.amd
     obsidian
     signal-desktop
     sops
@@ -92,11 +105,13 @@
     zoom-us
 
   ] ++ (with pkgs-unstable; [
-    claude-code
     gemini-cli
+  ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
+    claude-code
+    crush
   ]);
 
-  virtualisation.docker = {
+  virtualisation.podman = {
     enable = true;
   };
 
