@@ -50,6 +50,7 @@
     automatic = true;
     persistent = true;
   };
+  nixpkgs.config.rocmSupport = true;
 
   services.desktopManager.plasma6.enable = true;
   services.displayManager.sddm.enable = true;
@@ -57,7 +58,12 @@
     enable = true;
     # See https://ollama.com/library
     loadModels = [ "gpt-oss:20b" "qwen3:30b" ];
-    acceleration = "rocm";
+  };
+  services.open-webui = {
+    enable = true;
+    environment = {
+      WEBUI_AUTH = "False";
+    };
   };
   services.printing.enable = true;
   services.pulseaudio.enable = false;
@@ -79,6 +85,8 @@
   };
   security.sudo.wheelNeedsPassword = false;
 
+  programs.gamemode.enable = true;
+  programs.steam.enable = true;
   programs.kdeconnect.enable = true;
   programs.partition-manager.enable = true;
   programs.zsh.enable = true;
@@ -90,13 +98,19 @@
     bitwarden-desktop
     btop
     devenv
+    dua
     fluxcd
     hugo
     jq
     kubectl
     libreoffice
+    lutris
+    mangohud
+    ncdu
     nvtopPackages.amd
     obsidian
+    openssl
+    protonup-qt
     signal-desktop
     sops
     talosctl
@@ -109,6 +123,7 @@
   ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
     claude-code
     crush
+    opencode
   ]);
 
   virtualisation.podman = {

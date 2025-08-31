@@ -9,6 +9,11 @@
           "name": "Qwen 3 30B",
           "id": "qwen3:30b",
           "context_window": 256000
+        },
+        {
+          "name": "GPT 20b",
+          "id": "gpt-oss:20b",
+          "context_window": 128000
         }
       ]
     }
