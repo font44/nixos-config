@@ -58,6 +58,8 @@
     enable = true;
     # See https://ollama.com/library
     loadModels = [ "gpt-oss:20b" "qwen3:30b" ];
+    host = "0.0.0.0";
+    openFirewall = true;
   };
   services.open-webui = {
     enable = true;
