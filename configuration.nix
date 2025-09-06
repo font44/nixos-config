@@ -67,6 +67,14 @@
       WEBUI_AUTH = "False";
     };
   };
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
   services.printing.enable = true;
   services.pulseaudio.enable = false;
   services.pipewire = {
@@ -84,6 +92,9 @@
     hashedPassword = "$y$j9T$nRWH5xd2bDz3AGt4MQa2p0$GziPLTNhiS9mSCq.Me9i8hqNqTXSNkWB4NkO4r9u6x3";  # Generate using: mkpasswd
     extraGroups = [ "docker" "networkmanager" "podman" "wheel" ];
     shell = pkgs.zsh;
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGnS3nk+5uL0BE4oGpUf0JBYFNjJOcqLHjtiS3MVFGhM"
+    ];
   };
   security.sudo.wheelNeedsPassword = false;
 
@@ -115,17 +126,20 @@
     protonup-qt
     signal-desktop
     sops
+    ssh-to-age
     talosctl
+    tree
     vlc
     vscode
     zoom-us
 
   ] ++ (with pkgs-unstable; [
-    gemini-cli
+    obsidian
   ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
     claude-code
     crush
-    opencode
+    gemini-cli
+    qwen-code
   ]);
 
   virtualisation.podman = {

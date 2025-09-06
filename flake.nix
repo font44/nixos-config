@@ -18,7 +18,7 @@
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-	nix-ai-tools.url = "github:numtide/nix-ai-tools";
+    nix-ai-tools.url = "github:numtide/nix-ai-tools";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
