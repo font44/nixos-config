@@ -117,11 +117,14 @@
 
         home-manager.nixosModules.home-manager
         {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.extraSpecialArgs = { inherit inputs; };
+    		home-manager.useGlobalPkgs = true;
+        	home-manager.useUserPackages = true;
+          	home-manager.extraSpecialArgs = { inherit inputs; };
 
-          home-manager.users.ketan = import ./home.nix;
+          	home-manager.users.ketan = import ./home.nix;
+			home-manager.sharedModules = [
+				inputs.sops-nix.homeManagerModules.sops
+			];
         }
       ];
     };

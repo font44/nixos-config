@@ -45,6 +45,7 @@
 
   home.sessionVariables = {
     SSH_AUTH_SOCK = "${config.home.homeDirectory}/.bitwarden-ssh-agent.sock";
+    DEV_API_KEY_FOR_OPEN_ROUTER = "$(cat ${config.sops.secrets."api_key/open_router".path})";
   };
 
   services.copyq.enable = true;
@@ -55,6 +56,14 @@
       "f02aa75af4c0" = {
         id = "NIULDNJ-WZLFXF6-B2CFGL3-OXC6KXH-GDRXXTH-FIRCQTE-Q6XVEFY-46GGAQS";
       };
+    };
+  };
+
+  sops = {
+    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+    defaultSopsFile = ./secrets/default.yml;
+    secrets = {
+      "api_key/open_router" = {};
     };
   };
 

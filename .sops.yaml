@@ -1,0 +1,12 @@
+keys:
+  # cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
+  - &desktop age140mwr39uc7jv0c8qmuxu8cjdv2w2ac0ktfz07huyt5naeph3pf2q503uwl
+  # ssh-to-age -private-key -i priv > ~/.config/sops/age/keys.txt
+  # ssh-to-age -i pub
+  - &bitwarden age1n93u835nu8nxfetappazpl7ns4h3ys2ehzy624rzs2gp887zff9q96v7e5
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yml|json|env|ini)$
+    key_groups:
+      - age:
+        - *desktop
+        - *bitwarden

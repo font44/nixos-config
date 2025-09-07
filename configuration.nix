@@ -16,7 +16,7 @@
     enable32Bit = true;
   };
 
-  networking.hostName = "nixos";
+  networking.hostName = "yakima";
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   networking.networkmanager.enable = true;
@@ -108,9 +108,11 @@
 
   environment.systemPackages = with pkgs; [
     age
+    ansible
     bitwarden-desktop
     btop
     devenv
+    dig
     dua
     fluxcd
     hugo
