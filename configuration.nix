@@ -10,6 +10,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "usbcore.autosuspend=-1" ];
 
   hardware.graphics = {
     enable = true;
@@ -114,6 +115,7 @@
     devenv
     dig
     dua
+    envsubst
     fluxcd
     hugo
     jq

@@ -46,6 +46,7 @@
   home.sessionVariables = {
     SSH_AUTH_SOCK = "${config.home.homeDirectory}/.bitwarden-ssh-agent.sock";
     DEV_API_KEY_FOR_OPEN_ROUTER = "$(cat ${config.sops.secrets."api_key/open_router".path})";
+    DEV_API_KEY_FOR_TAVILY = "$(cat ${config.sops.secrets."api_key/tavily".path})";
   };
 
   services.copyq.enable = true;
@@ -64,6 +65,7 @@
     defaultSopsFile = ./secrets/default.yml;
     secrets = {
       "api_key/open_router" = {};
+      "api_key/tavily" = {};
     };
   };
 
