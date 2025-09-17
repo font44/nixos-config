@@ -1,0 +1,5 @@
+{
+  "ca-url": "https://web-server-1.lan.ketanvijayvargiya.com:12001",
+  "fingerprint": "1dd47e2e256612b7d187b84abf71260839b0de128df26b12752b3268b30bc347",
+  "root": "/home/ketan/.step/certs/root_ca.crt"
+}

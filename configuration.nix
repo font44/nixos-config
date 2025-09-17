@@ -110,6 +110,7 @@
   environment.systemPackages = with pkgs; [
     age
     ansible
+    ansible-lint
     bitwarden-desktop
     btop
     devenv
@@ -131,6 +132,7 @@
     signal-desktop
     sops
     ssh-to-age
+    step-cli
     talosctl
     tree
     vlc

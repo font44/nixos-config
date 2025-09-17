@@ -1,21 +1,28 @@
 {
+  "$schema": "https://charm.land/crush.json",
+  "mcp": {
+    "fetch": {
+      "type": "stdio",
+      "command": "podman",
+      "args": ["run", "-i", "--rm", "mcp/fetch"]
+    },
+    "puppeteer": {
+      "type": "stdio",
+      "command": "podman",
+      "args": ["run", "-i", "--rm", "--init", "-e", "DOCKER_CONTAINER=true", "--net", "host", "mcp/puppeteer"]
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  },
   "providers": {
-    "ollama": {
-      "name": "Ollama",
-      "base_url": "http://localhost:11434/v1/",
-      "type": "openai",
-      "models": [
-        {
-          "name": "Qwen 3 30B",
-          "id": "qwen3:30b",
-          "context_window": 256000
-        },
-        {
-          "name": "GPT 20b",
-          "id": "gpt-oss:20b",
-          "context_window": 128000
-        }
-      ]
+    "openrouter": {
+      "name": "OpenRouter",
+      "id": "openrouter",
+      "api_key": "$DEV_API_KEY_FOR_OPEN_ROUTER",
+      "base_url": "https://openrouter.ai/api/v1",
+      "type": "openai"
     }
   }
 }

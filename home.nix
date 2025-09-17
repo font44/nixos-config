@@ -70,6 +70,10 @@
   };
 
   xdg.configFile."crush/crush.json".source = ./crush.conf.json;
+  home.file = {
+    ".step/certs/root_ca.crt".source = ./stepca/root_ca.crt;
+    ".step/config/defaults.json".source = ./stepca/config.json;
+  };
 
   home.stateVersion = "25.05";
 }
