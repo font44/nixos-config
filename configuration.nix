@@ -76,7 +76,19 @@
       PermitRootLogin = "no";
     };
   };
-  services.printing.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
+  services.printing = {
+    enable = true;
+    drivers = with pkgs; [
+      cups-filters
+      cups-browsed
+    ];
+  };
   services.pulseaudio.enable = false;
   services.pipewire = {
     enable = true;
