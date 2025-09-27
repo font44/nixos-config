@@ -155,9 +155,9 @@
     obsidian
   ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
     claude-code
+    codex
     crush
     gemini-cli
-    qwen-code
   ]);
 
   virtualisation.podman = {
