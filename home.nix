@@ -16,6 +16,9 @@
     enable = true;
     userEmail = "hi@ketanvijayvargiya.com";
     userName = "Ketan Vijayvargiya";
+    extraConfig = {
+      init.defaultBranch = "main";
+    };
   };
   programs.firefox = {
     enable = true;

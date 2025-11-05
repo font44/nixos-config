@@ -58,7 +58,6 @@
   services.ollama = {
     enable = true;
     # See https://ollama.com/library
-    loadModels = [ "gpt-oss:20b" "qwen3:30b" ];
     host = "0.0.0.0";
     openFirewall = true;
   };
@@ -117,7 +116,10 @@
   programs.partition-manager.enable = true;
   programs.zsh.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    permittedInsecurePackages = [ "ventoy-qt5-1.1.05" ];
+  };
 
   environment.systemPackages = with pkgs; [
     age
@@ -132,7 +134,6 @@
     fluxcd
     hugo
     jq
-    kubectl
     libreoffice
     lutris
     mangohud
@@ -145,14 +146,16 @@
     sops
     ssh-to-age
     step-cli
-    talosctl
     tree
+    ventoy-full-qt
     vlc
     vscode
     zoom-us
 
   ] ++ (with pkgs-unstable; [
+    kubectl
     obsidian
+    talosctl
   ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
     claude-code
     codex
