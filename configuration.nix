@@ -115,7 +115,7 @@ in
   users.users.ketan = {
     isNormalUser = true;
     description = "Ketan Vijayvargiya";
-    hashedPassword = "$y$j9T$nRWH5xd2bDz3AGt4MQa2p0$GziPLTNhiS9mSCq.Me9i8hqNqTXSNkWB4NkO4r9u6x3";  # Generate using: mkpasswd
+    hashedPassword = "$y$j9T$k5FwsT0yGXVJwrCdo0Ew//$NlntOgydAMXMX4qLvmID9IBk8p1F4kmJx3TxUMFkIf3";  # Generate using: mkpasswd
     extraGroups = [ "docker" "networkmanager" "podman" "wheel" ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
@@ -141,7 +141,6 @@ in
     ansible-lint
     bitwarden-desktop
     btop
-    devenv
     dig
     dua
     envsubst
@@ -155,7 +154,6 @@ in
     my-helmfile
     ncdu
     nvtopPackages.amd
-    obsidian
     openssl
     protonup-qt
     signal-desktop
@@ -174,7 +172,6 @@ in
     talosctl
   ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
     claude-code
-    codex
     gemini-cli
   ]);
 
