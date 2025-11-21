@@ -124,11 +124,13 @@ in
   };
   security.sudo.wheelNeedsPassword = false;
 
-  programs.gamemode.enable = true;
-  programs.steam.enable = true;
-  programs.kdeconnect.enable = true;
-  programs.partition-manager.enable = true;
-  programs.zsh.enable = true;
+  programs = {
+    gamemode.enable = true;
+    localsend.enable = true;
+    partition-manager.enable = true;
+    steam.enable = true;
+    zsh.enable = true;
+  };
 
   nixpkgs.config = {
     allowUnfree = true;
