@@ -114,6 +114,7 @@
 	  };
 	}
         inputs.flox.nixosModules.flox
+		inputs.sops-nix.nixosModules.sops
 
         home-manager.nixosModules.home-manager
         {

@@ -74,6 +74,7 @@ in
     # See https://ollama.com/library
     host = "0.0.0.0";
     openFirewall = true;
+    package = pkgs-unstable.ollama;
   };
   services.open-webui = {
     enable = true;
@@ -110,6 +111,12 @@ in
     pulse.enable = true;
   };
   security.rtkit.enable = true;
+
+  sops.defaultSopsFile = ./secrets/default.yml;
+  sops.secrets = {
+    "wireguard/wg0/my_private_key" = {};
+    "wireguard/wg0/peer_psk" = {};
+  };
   
   users.mutableUsers = false;
   users.users.ketan = {
@@ -179,6 +186,31 @@ in
 
   virtualisation.podman = {
     enable = true;
+  };
+
+  # Run this as needed: `sudo systemctl start|stop wg-quick-wg0`
+  networking.wg-quick.interfaces = {
+    wg0 = {
+      address = [
+        "10.132.76.14/32"
+        "fd7d:76ee:e68f:a993:7a5a:2d9b:d8e8:9f81/128"
+      ];
+      dns = [
+        "10.128.0.1"
+        "fd7d:76ee:e68f:a993::1"
+      ];
+      mtu = 1320;
+      privateKeyFile = config.sops.secrets."wireguard/wg0/my_private_key".path;
+      autostart = false;
+      peers = [
+        {
+          publicKey = "PyLCXAQT8KkM4T+dUsOQfn+Ub3pGxfGlxkIApuig+hk=";
+          presharedKeyFile = config.sops.secrets."wireguard/wg0/peer_psk".path;
+          endpoint = "us3.vpn.airdns.org:1637";
+          allowedIPs = [ "0.0.0.0/0" "::/0" ];
+        }
+      ];
+    };
   };
 
   system.stateVersion = "25.05";
