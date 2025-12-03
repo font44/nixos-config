@@ -51,13 +51,13 @@ The configuration uses a multi-layer architecture:
 **Library Layer (lib/)**
 - `lib/default.nix`: Exports utility functions
 - `lib/mkSystem.nix`: Core system builder that:
-  - Accepts parameters: hostname, system, users, isDesktop, isServer, isAmdGpu
+  - Accepts parameters: hostname, system, isDesktop, isServer, isAmdGpu
   - Creates both stable `pkgs` and `pkgs-unstable` package sets
   - Passes `pkgs-unstable` and other args via specialArgs
   - Imports all modules from `modules/`
   - Loads host-specific configuration from `hosts/${hostname}/`
   - Conditionally enables modules based on boolean flags
-  - Sets up home-manager for all specified users
+  - Automatically sets up home-manager for users defined in `my.users.users`
 
 **Modules Layer (modules/)**
 - Each module uses the `my.${module-name}.enable` option pattern
@@ -124,7 +124,7 @@ in {
 ### Adding a New Host
 
 To add a new host:
-1. Create `hosts/${hostname}/configuration.nix` with host-specific settings
+1. Create `hosts/${hostname}/configuration.nix` with host-specific settings and user declarations
 2. Create `hosts/${hostname}/hardware-configuration.nix` (can be auto-generated)
 3. Optionally create `hosts/${hostname}/disko.nix` for declarative partitioning
 4. Add host to flake.nix using `lib.mkSystem`:
@@ -134,13 +134,9 @@ nixosConfigurations.newhostname = lib.mkSystem {
   system = "x86_64-linux";
   isDesktop = false;  # or true for desktop hosts
   isAmdGpu = false;   # or true for AMD GPU systems
-  users = [{
-    name = "username";
-    email = "user@example.com";
-    fullName = "Full Name";
-  }];
 };
 ```
+5. Define users in `hosts/${hostname}/configuration.nix` using `my.users.users.<name>` options
 
 ### Disk Configuration (Disko)
 

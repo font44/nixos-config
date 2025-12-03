@@ -2,7 +2,6 @@
 
 { hostname
 , system
-, users
 , isDesktop ? false
 , isServer ? false
 , isAmdGpu ? false
@@ -42,12 +41,13 @@ inputs.nixpkgs.lib.nixosSystem {
         inputs.sops-nix.homeManagerModules.sops
       ];
 
-      home-manager.users = builtins.listToAttrs (
-        map (user: {
-          name = user.name;
-          value = import ../users/user.nix user;
-        }) users
-      );
+      home-manager.users = inputs.nixpkgs.lib.mkMerge [
+        (inputs.nixpkgs.lib.mkIf (config.my.users.enable or false) (
+          inputs.nixpkgs.lib.mapAttrs (name: user: import ../users/user.nix {
+            inherit (user) name email fullName;
+          }) config.my.users.users
+        ))
+      ];
     }
 
     {

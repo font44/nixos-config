@@ -41,11 +41,6 @@
         system = "x86_64-linux";
         isDesktop = true;
         isAmdGpu = true;
-        users = [{
-          name = "ketan";
-          email = "hi@ketanvijayvargiya.com";
-          fullName = "Ketan Vijayvargiya";
-        }];
       };
     };
   };
