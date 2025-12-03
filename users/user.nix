@@ -1,10 +1,10 @@
 { name, email, fullName, ... }@userParams:
 
-{ config, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   home.username = name;
-  home.homeDirectory = "/home/${name}";
+  home.homeDirectory = lib.mkDefault "/home/${name}";
 
   programs.git = {
     enable = true;

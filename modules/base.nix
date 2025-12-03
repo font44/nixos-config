@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, inputs, lib, ... }:
 
 with lib;
 
@@ -28,5 +28,7 @@ in {
       LC_TELEPHONE = cfg.locale;
       LC_TIME = cfg.locale;
     };
+
+    my.nix.enable = inputs.nixpkgs.lib.mkDefault true;
   };
 }

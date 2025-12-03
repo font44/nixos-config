@@ -2,15 +2,16 @@
 
 {
   imports = [
+    ./amd-gpu.nix
     ./base.nix
-    ./nix.nix
-    ./networking.nix
-    ./users.nix
     ./desktop.nix
-    ./gaming.nix
-    ./local-llm.nix
     ./dev-setup.nix
-    ./home.nix
+    ./gaming.nix
     ./home-desktop.nix
+    ./home.nix
+    ./local-llm.nix
+    ./networking.nix
+    ./nix.nix
+    ./users.nix
   ];
 }

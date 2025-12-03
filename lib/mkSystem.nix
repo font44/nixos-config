@@ -57,6 +57,7 @@ inputs.nixpkgs.lib.nixosSystem {
     (inputs.nixpkgs.lib.mkIf isDesktop {
       my.desktop.enable = inputs.nixpkgs.lib.mkDefault true;
       my.home.desktop.enable = inputs.nixpkgs.lib.mkDefault true;
+      my.users.enable = inputs.nixpkgs.lib.mkDefault true;
     })
 
     (inputs.nixpkgs.lib.mkIf isAmdGpu {

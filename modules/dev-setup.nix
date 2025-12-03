@@ -32,7 +32,6 @@ in {
 
       pkgs.age
       pkgs.ansible
-      pkgs.ansible-lint
       pkgs.btop
       pkgs.dig
       pkgs.dua
@@ -50,6 +49,7 @@ in {
       talosctl
     ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
       claude-code
+      gemini-cli
     ]);
   };
 }
