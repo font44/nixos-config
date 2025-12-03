@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a NixOS configuration repository using Nix Flakes for system and home management. It configures a single host named "yakima" with a KDE Plasma 6 desktop environment.
+This is a modular NixOS configuration repository using Nix Flakes for multi-host system and home management. The architecture is designed to support multiple hosts with shared modules and user configurations.
 
 ## Key Commands
 
@@ -40,118 +40,148 @@ sudo nix-collect-garbage -d
 
 ## Architecture
 
-### Flake Structure
+### Modular Structure
 
-The configuration uses a standard NixOS flake with the following key inputs:
-- **nixpkgs** (25.05): Primary package source
-- **nixpkgs-unstable**: Used for newer versions of specific packages (kubectl, obsidian, talosctl)
-- **home-manager** (release-25.05): User environment management
-- **disko**: Declarative disk partitioning
-- **sops-nix**: Secret management using SOPS
-- **flox**: Package management tool
-- **nix-ai-tools**: Provides claude-code
+The configuration uses a multi-layer architecture:
 
-### File Organization
+**Flake Entry (flake.nix)**
+- Defines flake inputs and outputs
+- Calls `lib.mkSystem` to construct each host
 
-- **flake.nix**: Main entry point, defines system configuration and flake inputs
-- **configuration.nix**: System-level configuration (services, packages, users)
-- **home.nix**: User-level configuration for user "ketan" (programs, dotfiles)
-- **hardware-configuration.nix**: Hardware-specific settings (auto-generated)
-- **secrets/**: SOPS-encrypted secrets
-- **.sops.yaml**: SOPS configuration with age keys
+**Library Layer (lib/)**
+- `lib/default.nix`: Exports utility functions
+- `lib/mkSystem.nix`: Core system builder that:
+  - Accepts parameters: hostname, system, users, isDesktop, isServer, isAmdGpu
+  - Creates both stable `pkgs` and `pkgs-unstable` package sets
+  - Passes `pkgs-unstable` and other args via specialArgs
+  - Imports all modules from `modules/`
+  - Loads host-specific configuration from `hosts/${hostname}/`
+  - Conditionally enables modules based on boolean flags
+  - Sets up home-manager for all specified users
+
+**Modules Layer (modules/)**
+- Each module uses the `my.${module-name}.enable` option pattern
+- `modules/default.nix`: Imports all available modules
+- Individual modules define `options.my.${name}` for configuration
+- All modules use `mkIf cfg.enable` for conditional activation
+- Available modules:
+  - `base.nix`: Core locale configuration (always enabled by default)
+  - `nix.nix`: Nix daemon and flake settings
+  - `networking.nix`: Network configuration with NetworkManager
+  - `users.nix`: User account management with `my.users.users.<name>` options
+  - `desktop.nix`: KDE Plasma desktop environment
+  - `gaming.nix`: Gaming-related packages and configurations
+  - `local-llm.nix`: Ollama and Open WebUI services
+  - `dev-setup.nix`: Development tools and environments
+  - `home.nix`: Base home-manager configurations
+  - `home-desktop.nix`: Desktop-specific home-manager settings
+  - `amd-gpu.nix`: AMD GPU support
+
+**Host Layer (hosts/${hostname}/)**
+- `configuration.nix`: Host-specific settings (timezone, user assignments, services)
+- `hardware-configuration.nix`: Auto-generated hardware configuration
+- `disko.nix`: Optional disk partitioning schema (LUKS + btrfs)
+
+**User Layer (users/)**
+- `user.nix`: Reusable user configuration template
+- Takes parameters: name, email, fullName
+- Defines home-manager configuration with git, sops secrets, session variables
+- Applied to users via home-manager in mkSystem
 
 ### Special Args Pattern
 
-The flake passes `pkgs-unstable` as a special argument to modules, allowing selective use of unstable packages:
+`mkSystem.nix` creates and passes these special arguments to all modules:
 ```nix
 specialArgs = {
-  inherit inputs;
-  pkgs-unstable = import inputs.nixpkgs-unstable {
-    inherit system;
-    config.allowUnfree = true;
-  };
+  inherit inputs pkgs-unstable hostname;
 };
 ```
 
-Use `pkgs` for stable packages and `pkgs-unstable` for newer versions.
+Use `pkgs` for stable packages (25.05) and `pkgs-unstable` for newer versions.
+
+### Module Options Pattern
+
+All modules follow this structure:
+```nix
+{ config, lib, ... }:
+
+with lib;
+
+let
+  cfg = config.my.module-name;
+in {
+  options.my.module-name = {
+    enable = mkEnableOption "description";
+    # additional options
+  };
+
+  config = mkIf cfg.enable {
+    # implementation
+  };
+}
+```
+
+### Adding a New Host
+
+To add a new host:
+1. Create `hosts/${hostname}/configuration.nix` with host-specific settings
+2. Create `hosts/${hostname}/hardware-configuration.nix` (can be auto-generated)
+3. Optionally create `hosts/${hostname}/disko.nix` for declarative partitioning
+4. Add host to flake.nix using `lib.mkSystem`:
+```nix
+nixosConfigurations.newhostname = lib.mkSystem {
+  hostname = "newhostname";
+  system = "x86_64-linux";
+  isDesktop = false;  # or true for desktop hosts
+  isAmdGpu = false;   # or true for AMD GPU systems
+  users = [{
+    name = "username";
+    email = "user@example.com";
+    fullName = "Full Name";
+  }];
+};
+```
 
 ### Disk Configuration (Disko)
 
-The system uses LUKS encryption on btrfs with the following subvolumes:
+The current host uses LUKS encryption on btrfs with these subvolumes:
 - `/root` → `/`
 - `/home` → `/home`
 - `/nix` → `/nix`
 - `/swap` → `/.swap` (16GB swapfile)
 
-All subvolumes use `compress=zstd` and `noatime` mount options.
+All subvolumes use `compress=zstd` and `noatime` mount options. Disko configuration is in `hosts/${hostname}/disko.nix`.
 
 ### Secret Management
 
 Secrets are managed with SOPS and age encryption:
-- System secrets defined in `configuration.nix` (WireGuard keys)
-- User secrets defined in `home.nix` (API keys, container registry credentials)
+- System secrets: defined in host `configuration.nix` (e.g., WireGuard keys)
+- User secrets: defined in `users/user.nix` (API keys, container registry credentials)
 - Age keys derived from SSH host keys (`ssh-to-age`)
-- Two age recipients: desktop (host key) and bitwarden (personal key)
+- Secrets file: `secrets/default.yml`
+- SOPS configuration: `.sops.yaml`
 
 To edit secrets:
 ```sh
 sops secrets/default.yml
 ```
 
-### Package Customization
+### User Management via Custom Options
 
-Custom package wrappers are defined in configuration files:
-- **my-kubernetes-helm**: Helm with plugins (secrets, diff, s3, git)
-- **my-helmfile**: Helmfile configured to use the custom Helm wrapper
-
-Pattern for wrapping packages with plugins:
+Users are declared in host configuration using the custom `my.users.users.<name>` options:
 ```nix
-let
-  my-kubernetes-helm = with pkgs; wrapHelm kubernetes-helm {
-    plugins = with pkgs.kubernetes-helmPlugins; [ ... ];
-  };
-  my-helmfile = pkgs.helmfile-wrapped.override {
-    inherit (my-kubernetes-helm) pluginsDir;
-  };
-in
+my.users.users.ketan = {
+  name = "ketan";
+  fullName = "Ketan Vijayvargiya";
+  email = "hi@ketanvijayvargiya.com";
+  hashedPassword = "$y$...";
+  isAdmin = true;
+  sshKeys = [ "ssh-ed25519 ..." ];
+  extraGroups = [ "docker" "networkmanager" "podman" ];
+};
 ```
 
-### User Management
-
-- User: ketan
-- Password: Hashed using yescrypt (`mkpasswd`)
-- `mutableUsers = false`: Users managed declaratively only
-- Sudo without password for wheel group
-- Default shell: zsh
-
-### Services
-
-Key system services:
-- **ollama**: LLM inference server (unstable version, exposed on 0.0.0.0)
-- **open-webui**: Web UI for Ollama (auth disabled)
-- **WireGuard**: VPN interface `wg0` (manual start via systemd)
-- **SSH**: Password authentication disabled, key-only access
-- **Avahi**: mDNS for local network discovery
-
-WireGuard management:
-```sh
-sudo systemctl start wg-quick-wg0
-sudo systemctl stop wg-quick-wg0
-```
-
-## Home Manager Integration
-
-Home Manager is integrated as a NixOS module (not standalone). User configurations are in `home.nix` and applied to the user "ketan" via:
-```nix
-home-manager.users.ketan = import ./home.nix;
-```
-
-Key programs configured via Home Manager:
-- **direnv**: Automatic environment activation
-- **git**: User identity and default branch
-- **neovim**: Default editor
-- **tmux/zellij**: Terminal multiplexers
-- **zsh**: Shell with syntax highlighting
+The `modules/users.nix` module processes these options to create system users and applies the corresponding user template from `users/user.nix` via home-manager.
 
 ## Testing Changes
 
@@ -161,5 +191,8 @@ When modifying configurations:
 3. If successful, apply with `sudo nixos-rebuild switch --flake .#yakima`
 4. Commit changes to git
 
-For home-manager only changes, the same commands work as home-manager is integrated into the NixOS configuration.
-- Never add trivial code comments.
+For module changes, ensure the module option is enabled in the host configuration.
+
+## Additional instructions
+
+- Never add trivial code comments. ONLY add when the business logic is complex enough to warrant comments.
