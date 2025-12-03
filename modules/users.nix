@@ -54,23 +54,7 @@ let
   };
 in {
   options.my.users = {
-    enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable user management";
-    };
-
-    mutableUsers = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Allow users to be managed outside of configuration";
-    };
-
-    wheelNeedsPassword = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Require password for sudo";
-    };
+    enable = mkEnableOption "user management";
 
     users = mkOption {
       type = types.attrsOf userModule;
@@ -80,8 +64,8 @@ in {
   };
 
   config = mkIf cfg.enable {
-    users.mutableUsers = cfg.mutableUsers;
-    security.sudo.wheelNeedsPassword = cfg.wheelNeedsPassword;
+    users.mutableUsers = false;
+    security.sudo.wheelNeedsPassword = false;
 
     users.users = mapAttrs (name: user: {
       isNormalUser = true;

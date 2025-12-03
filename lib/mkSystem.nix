@@ -3,6 +3,9 @@
 { hostname
 , system
 , users
+, isDesktop ? false
+, isServer ? false
+, isAmdGpu ? false
 }:
 
 let
@@ -20,7 +23,7 @@ inputs.nixpkgs.lib.nixosSystem {
   inherit system;
 
   specialArgs = {
-    inherit inputs pkgs-unstable;
+    inherit inputs pkgs-unstable hostname;
   };
 
   modules = [
@@ -46,6 +49,19 @@ inputs.nixpkgs.lib.nixosSystem {
         }) users
       );
     }
+
+    {
+      my.base.enable = inputs.nixpkgs.lib.mkDefault true;
+    }
+
+    (inputs.nixpkgs.lib.mkIf isDesktop {
+      my.desktop.enable = inputs.nixpkgs.lib.mkDefault true;
+      my.home.desktop.enable = inputs.nixpkgs.lib.mkDefault true;
+    })
+
+    (inputs.nixpkgs.lib.mkIf isAmdGpu {
+      my.amd-gpu-support.enable = inputs.nixpkgs.lib.mkDefault true;
+    })
 
     (../hosts + "/${hostname}/configuration.nix")
     (../hosts + "/${hostname}/hardware-configuration.nix")

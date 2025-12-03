@@ -15,7 +15,6 @@ in {
 
   config = mkIf cfg.enable {
     home-manager.sharedModules = [{
-      # Shell configuration
       programs.zsh = {
         enable = true;
         syntaxHighlighting.enable = true;
@@ -31,7 +30,6 @@ in {
         enableZshIntegration = true;
       };
 
-      # Editor configuration
       programs.neovim = {
         enable = true;
         defaultEditor = true;
@@ -39,7 +37,6 @@ in {
         vimAlias = true;
       };
 
-      # Terminal multiplexers
       programs.tmux = {
         enable = true;
         mouse = true;

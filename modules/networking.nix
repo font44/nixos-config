@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, hostname, ... }:
 
 with lib;
 
@@ -7,42 +7,19 @@ let
 in {
   options.my.networking = {
     enable = mkEnableOption "networking configuration";
-
-    networkManager = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable NetworkManager for network management";
-    };
-
-    ssh.enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable SSH server";
-    };
-
-    avahi.enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable Avahi mDNS";
-    };
   };
 
   config = mkIf cfg.enable {
-    networking.networkmanager.enable = mkIf cfg.networkManager true;
+    networking.hostName = hostname;
+    networking.networkmanager.enable = true;
 
-    services.openssh = mkIf cfg.ssh.enable {
+    services.openssh = {
       enable = true;
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
         PermitRootLogin = "no";
       };
-    };
-
-    services.avahi = mkIf cfg.avahi.enable {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
     };
   };
 }

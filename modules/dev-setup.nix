@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgs-unstable, ... }:
+{ config, inputs, lib, pkgs, pkgs-unstable, ... }:
 
 with lib;
 
@@ -23,17 +23,13 @@ in {
   };
 
   config = mkIf cfg.enable {
-    # Container runtime
     virtualisation.podman.enable = true;
 
-    # Development packages
     environment.systemPackages = [
-      # Kubernetes tools
       my-kubernetes-helm
       my-helmfile
       pkgs.fluxcd
 
-      # Dev tools
       pkgs.age
       pkgs.ansible
       pkgs.ansible-lint
@@ -52,6 +48,8 @@ in {
     ] ++ (with pkgs-unstable; [
       kubectl
       talosctl
+    ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
+      claude-code
     ]);
   };
 }

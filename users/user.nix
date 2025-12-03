@@ -6,7 +6,6 @@
   home.username = name;
   home.homeDirectory = "/home/${name}";
 
-  # Git configuration with parameterized user info
   programs.git = {
     enable = true;
     userName = fullName;
@@ -16,7 +15,6 @@
     };
   };
 
-  # Session variables
   home.sessionVariables = {
     SSH_AUTH_SOCK = "${config.home.homeDirectory}/.bitwarden-ssh-agent.sock";
     DEV_API_KEY_FOR_OPEN_ROUTER = "$(cat ${config.sops.secrets."api_key/open_router".path})";
@@ -25,7 +23,6 @@
     GITLAB_REGISTRY_TOKEN = "$(cat ${config.sops.secrets."container_registry/gitlab/token".path})";
   };
 
-  # SOPS secrets
   sops = {
     age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
     defaultSopsFile = ../secrets/default.yml;
@@ -37,7 +34,6 @@
     };
   };
 
-  # Step CA certificates
   home.file = {
     ".step/certs/root_ca.crt".source = ../stepca/root_ca.crt;
     ".step/config/defaults.json".source = ../stepca/config.json;

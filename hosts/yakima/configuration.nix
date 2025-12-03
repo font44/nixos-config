@@ -5,39 +5,17 @@
     ./hardware-configuration.nix
   ];
 
-  # Boot configuration
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "usbcore.autosuspend=-1" ];
 
-  # Hostname and timezone
-  networking.hostName = "yakima";
   time.timeZone = "America/Los_Angeles";
 
-  # Locale settings
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
-  # Enable module groups
   my.networking.enable = true;
-  my.desktop.enable = true;
   my.desktop.gaming.enable = true;
   my.dev-setup.enable = true;
-  my.services.local-llm.enable = true;
-  my.home.desktop.enable = true;
 
-  # User configuration
   my.users.users.ketan = {
     name = "ketan";
     fullName = "Ketan Vijayvargiya";
@@ -50,14 +28,12 @@
     extraGroups = [ "docker" "networkmanager" "podman" ];
   };
 
-  # SOPS secrets
   sops.defaultSopsFile = ../../secrets/default.yml;
   sops.secrets = {
     "wireguard/wg0/my_private_key" = {};
     "wireguard/wg0/peer_psk" = {};
   };
 
-  # WireGuard (host-specific configuration)
   networking.wg-quick.interfaces = {
     wg0 = {
       address = [
@@ -81,29 +57,6 @@
       ];
     };
   };
-
-  # Additional programs
-  programs.localsend.enable = true;
-
-  # Additional packages not in modules
-  nixpkgs.config.permittedInsecurePackages = [ "ventoy-qt5-1.1.05" ];
-  environment.systemPackages = with pkgs; [
-    bitwarden-desktop
-    libreoffice
-    nvtopPackages.amd
-    signal-desktop
-    ventoy-full-qt
-    vlc
-    vscode
-    zoom-us
-  ] ++ (with pkgs-unstable; [
-    obsidian
-  ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
-    claude-code
-  ]);
-
-  # ROCm support for AMD GPU
-  nixpkgs.config.rocmSupport = true;
 
   system.stateVersion = "25.05";
 }

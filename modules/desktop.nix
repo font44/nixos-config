@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, pkgs-unstable, ... }:
 
 with lib;
 
@@ -10,13 +10,25 @@ in {
   };
 
   config = mkIf cfg.enable {
-    # KDE Plasma 6
     services.desktopManager.plasma6.enable = true;
     services.displayManager.sddm.enable = true;
 
     programs.partition-manager.enable = true;
+    programs.localsend.enable = true;
 
-    # Audio (PipeWire)
+    nixpkgs.config.permittedInsecurePackages = [ "ventoy-qt5-1.1.05" ];
+    environment.systemPackages = with pkgs; [
+      bitwarden-desktop
+      libreoffice
+      signal-desktop
+      ventoy-full-qt
+      vlc
+      vscode
+      zoom-us
+    ] ++ (with pkgs-unstable; [
+      obsidian
+    ]);
+
     services.pulseaudio.enable = false;
     services.pipewire = {
       enable = true;
@@ -26,7 +38,6 @@ in {
     };
     security.rtkit.enable = true;
 
-    # Printing (CUPS)
     services.printing = {
       enable = true;
       drivers = with pkgs; [
@@ -35,7 +46,12 @@ in {
       ];
     };
 
-    # Graphics
+    services.avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+    };
+
     hardware.graphics = {
       enable = true;
       enable32Bit = true;
