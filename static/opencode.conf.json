@@ -1,0 +1,25 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "fetch": {
+      "type": "local",
+      "command": ["podman", "run", "-i", "--rm", "mcp/fetch"]
+    },
+    "puppeteer": {
+      "type": "local",
+      "command": ["podman", "run", "-i", "--rm", "--init", "-e", "DOCKER_CONTAINER=true", "--net", "host", "mcp/puppeteer"]
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  },
+  "provider": {
+    "openrouter": {
+	  "options": {
+		"apiKey": "{env:DEV_API_KEY_FOR_OPEN_ROUTER}",
+		"baseURL": "https://openrouter.ai/api/v1",
+	  }
+    }
+  }
+}

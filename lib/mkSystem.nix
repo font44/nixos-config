@@ -40,7 +40,9 @@ inputs.nixpkgs.lib.nixosSystem {
       home-manager.sharedModules = [
         inputs.sops-nix.homeManagerModules.sops
       ];
+    }
 
+    ({ config, ... }: {
       home-manager.users = inputs.nixpkgs.lib.mkMerge [
         (inputs.nixpkgs.lib.mkIf (config.my.users.enable or false) (
           inputs.nixpkgs.lib.mapAttrs (name: user: import ../users/user.nix {
@@ -48,7 +50,7 @@ inputs.nixpkgs.lib.nixosSystem {
           }) config.my.users.users
         ))
       ];
-    }
+    })
 
     {
       my.base.enable = inputs.nixpkgs.lib.mkDefault true;

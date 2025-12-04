@@ -28,28 +28,30 @@ in {
     environment.systemPackages = [
       my-kubernetes-helm
       my-helmfile
-      pkgs.fluxcd
-
-      pkgs.age
-      pkgs.ansible
-      pkgs.btop
-      pkgs.dig
-      pkgs.dua
-      pkgs.envsubst
-      pkgs.hugo
-      pkgs.jq
-      pkgs.ncdu
-      pkgs.openssl
-      pkgs.sops
-      pkgs.ssh-to-age
-      pkgs.step-cli
-      pkgs.tree
-    ] ++ (with pkgs-unstable; [
+    ] ++ (with pkgs; [
+      age
+      ansible
+      btop
+      dig
+      dua
+      envsubst
+      fluxcd
+      hugo
+      jq
+      ncdu
+      openssl
+      sops
+      ssh-to-age
+      step-cli
+      tree
+    ]) ++ (with pkgs-unstable; [
       kubectl
       talosctl
     ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
       claude-code
+      crush
       gemini-cli
+      opencode
     ]);
   };
 }
