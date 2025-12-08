@@ -2,6 +2,7 @@
 
 { hostname
 , system
+, users ? {}
 , isDesktop ? false
 , isServer ? false
 , isAmdGpu ? false
@@ -22,7 +23,7 @@ inputs.nixpkgs.lib.nixosSystem {
   inherit system;
 
   specialArgs = {
-    inherit inputs pkgs-unstable hostname;
+    inherit inputs pkgs-unstable hostname users;
   };
 
   modules = [
@@ -41,16 +42,6 @@ inputs.nixpkgs.lib.nixosSystem {
         inputs.sops-nix.homeManagerModules.sops
       ];
     }
-
-    ({ config, ... }: {
-      home-manager.users = inputs.nixpkgs.lib.mkMerge [
-        (inputs.nixpkgs.lib.mkIf (config.my.users.enable or false) (
-          inputs.nixpkgs.lib.mapAttrs (name: user: import ../users/user.nix {
-            inherit (user) name email fullName;
-          }) config.my.users.users
-        ))
-      ];
-    })
 
     {
       my.base.enable = inputs.nixpkgs.lib.mkDefault true;

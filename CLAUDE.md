@@ -51,13 +51,13 @@ The configuration uses a multi-layer architecture:
 **Library Layer (lib/)**
 - `lib/default.nix`: Exports utility functions
 - `lib/mkSystem.nix`: Core system builder that:
-  - Accepts parameters: hostname, system, isDesktop, isServer, isAmdGpu
+  - Accepts parameters: hostname, system, users, isDesktop, isServer, isAmdGpu
   - Creates both stable `pkgs` and `pkgs-unstable` package sets
-  - Passes `pkgs-unstable` and other args via specialArgs
+  - Passes `pkgs-unstable`, `users`, and other args via specialArgs
   - Imports all modules from `modules/`
   - Loads host-specific configuration from `hosts/${hostname}/`
   - Conditionally enables modules based on boolean flags
-  - Automatically sets up home-manager for users defined in `my.users.users`
+  - Sets up home-manager foundation (users configured in `modules/users.nix`)
 
 **Modules Layer (modules/)**
 - Each module uses the `my.${module-name}.enable` option pattern
@@ -67,8 +67,8 @@ The configuration uses a multi-layer architecture:
 - Available modules:
   - `base.nix`: Core locale configuration (always enabled by default)
   - `nix.nix`: Nix daemon and flake settings
-  - `networking.nix`: Network configuration with NetworkManager
-  - `users.nix`: User account management with `my.users.users.<name>` options
+  - `networking.nix`: Network configuration with NetworkManager and OpenSSH
+  - `users.nix`: User account management receiving users from specialArgs, handles both system users and home-manager integration
   - `desktop.nix`: KDE Plasma desktop environment
   - `gaming.nix`: Gaming-related packages and configurations
   - `local-llm.nix`: Ollama and Open WebUI services
@@ -78,7 +78,7 @@ The configuration uses a multi-layer architecture:
   - `amd-gpu.nix`: AMD GPU support
 
 **Host Layer (hosts/${hostname}/)**
-- `configuration.nix`: Host-specific settings (timezone, user assignments, services)
+- `configuration.nix`: Host-specific settings (timezone, services, system configuration)
 - `hardware-configuration.nix`: Auto-generated hardware configuration
 - `disko.nix`: Optional disk partitioning schema (LUKS + btrfs)
 
@@ -86,18 +86,18 @@ The configuration uses a multi-layer architecture:
 - `user.nix`: Reusable user configuration template
 - Takes parameters: name, email, fullName
 - Defines home-manager configuration with git, sops secrets, session variables
-- Applied to users via home-manager in mkSystem
+- Applied to users via home-manager in `modules/users.nix`
 
 ### Special Args Pattern
 
 `mkSystem.nix` creates and passes these special arguments to all modules:
 ```nix
 specialArgs = {
-  inherit inputs pkgs-unstable hostname;
+  inherit inputs pkgs-unstable hostname users;
 };
 ```
 
-Use `pkgs` for stable packages (25.05) and `pkgs-unstable` for newer versions.
+Use `pkgs` for stable packages (25.05) and `pkgs-unstable` for newer versions. The `users` attrset is passed from `flake.nix` and contains user definitions.
 
 ### Module Options Pattern
 
@@ -124,19 +124,29 @@ in {
 ### Adding a New Host
 
 To add a new host:
-1. Create `hosts/${hostname}/configuration.nix` with host-specific settings and user declarations
+1. Create `hosts/${hostname}/configuration.nix` with host-specific settings
 2. Create `hosts/${hostname}/hardware-configuration.nix` (can be auto-generated)
 3. Optionally create `hosts/${hostname}/disko.nix` for declarative partitioning
-4. Add host to flake.nix using `lib.mkSystem`:
+4. Add host to `flake.nix` using `lib.mkSystem` with user definitions:
 ```nix
 nixosConfigurations.newhostname = lib.mkSystem {
   hostname = "newhostname";
   system = "x86_64-linux";
   isDesktop = false;  # or true for desktop hosts
   isAmdGpu = false;   # or true for AMD GPU systems
+  users = {
+    username = {
+      name = "username";
+      fullName = "Full Name";
+      email = "user@example.com";
+      hashedPassword = "$y$...";  # generate with mkpasswd
+      isAdmin = true;
+      sshKeys = [ "ssh-ed25519 ..." ];
+      extraGroups = [ "docker" "networkmanager" ];
+    };
+  };
 };
 ```
-5. Define users in `hosts/${hostname}/configuration.nix` using `my.users.users.<name>` options
 
 ### Disk Configuration (Disko)
 
@@ -162,22 +172,32 @@ To edit secrets:
 sops secrets/default.yml
 ```
 
-### User Management via Custom Options
+### User Management
 
-Users are declared in host configuration using the custom `my.users.users.<name>` options:
+Users are defined in `flake.nix` as a parameter to `lib.mkSystem`:
 ```nix
-my.users.users.ketan = {
-  name = "ketan";
-  fullName = "Ketan Vijayvargiya";
-  email = "hi@ketanvijayvargiya.com";
-  hashedPassword = "$y$...";
-  isAdmin = true;
-  sshKeys = [ "ssh-ed25519 ..." ];
-  extraGroups = [ "docker" "networkmanager" "podman" ];
+nixosConfigurations.yakima = lib.mkSystem {
+  hostname = "yakima";
+  users = {
+    ketan = {
+      name = "ketan";
+      fullName = "Ketan Vijayvargiya";
+      email = "hi@ketanvijayvargiya.com";
+      hashedPassword = "$y$...";
+      isAdmin = true;
+      sshKeys = [ "ssh-ed25519 ..." ];
+      extraGroups = [ "docker" "networkmanager" "podman" ];
+    };
+  };
 };
 ```
 
-The `modules/users.nix` module processes these options to create system users and applies the corresponding user template from `users/user.nix` via home-manager.
+The users attrset is passed through specialArgs to all modules. The `modules/users.nix` module:
+- Creates system users with the provided configuration
+- Sets up home-manager integration using templates from `users/user.nix`
+- Handles both system-level user accounts and home-manager configurations in one place
+
+Note: OpenSSH is configured with `PasswordAuthentication = false` (key-based auth only). User passwords work for local/console login and sudo.
 
 ## Testing Changes
 

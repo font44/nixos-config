@@ -16,18 +16,6 @@
   my.desktop.gaming.enable = true;
   my.dev-setup.enable = true;
 
-  my.users.users.ketan = {
-    name = "ketan";
-    fullName = "Ketan Vijayvargiya";
-    email = "hi@ketanvijayvargiya.com";
-    hashedPassword = "$y$j9T$k5FwsT0yGXVJwrCdo0Ew//$NlntOgydAMXMX4qLvmID9IBk8p1F4kmJx3TxUMFkIf3";
-    isAdmin = true;
-    sshKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGnS3nk+5uL0BE4oGpUf0JBYFNjJOcqLHjtiS3MVFGhM"
-    ];
-    extraGroups = [ "docker" "networkmanager" "podman" ];
-  };
-
   sops.defaultSopsFile = ../../secrets/default.yml;
   sops.secrets = {
     "wireguard/wg0/my_private_key" = {};
