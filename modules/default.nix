@@ -12,6 +12,7 @@
     ./local-llm.nix
     ./networking.nix
     ./nix.nix
+    ./restic-backup.nix
     ./users.nix
   ];
 }

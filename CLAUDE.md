@@ -38,6 +38,32 @@ sudo nixos-rebuild build --flake .#yakima
 sudo nix-collect-garbage -d
 ```
 
+### Backup Management
+```sh
+# Check backup status and timers
+systemctl status restic-backups-home.service
+systemctl list-timers restic-backups-home.timer
+
+# Trigger manual backup
+sudo systemctl start restic-backups-home.service
+
+# Monitor backup execution
+sudo journalctl -fu restic-backups-home.service
+
+# List snapshots
+sudo restic -r /mnt/nfs-backups/yakima-restic-repo snapshots \
+  --password-file /run/secrets/backups/restic/password
+
+# Restore files from latest snapshot
+sudo restic -r /mnt/nfs-backups/yakima-restic-repo restore latest \
+  --target /tmp/restore --password-file /run/secrets/backups/restic/password
+
+# Restore specific files
+sudo restic -r /mnt/nfs-backups/yakima-restic-repo restore latest \
+  --target /tmp/restore --include /home/user/Documents \
+  --password-file /run/secrets/backups/restic/password
+```
+
 ## Architecture
 
 ### Modular Structure
@@ -76,6 +102,7 @@ The configuration uses a multi-layer architecture:
   - `home.nix`: Base home-manager configurations
   - `home-desktop.nix`: Desktop-specific home-manager settings
   - `amd-gpu.nix`: AMD GPU support
+  - `restic-backup.nix`: Automated encrypted backups to NFS server
 
 **Host Layer (hosts/${hostname}/)**
 - `configuration.nix`: Host-specific settings (timezone, services, system configuration)
@@ -198,6 +225,50 @@ The users attrset is passed through specialArgs to all modules. The `modules/use
 - Handles both system-level user accounts and home-manager configurations in one place
 
 Note: OpenSSH is configured with `PasswordAuthentication = false` (key-based auth only). User passwords work for local/console login and sudo.
+
+### Backup Configuration
+
+Automated backups are configured using Restic with the following setup:
+
+**Configuration**
+- **Module**: `modules/restic-backup.nix` (enabled via `my.backup.enable`)
+- **NFS Server**: 10.0.1.40 at `/var/nfs/shared/Backups`
+- **Mount Point**: `/mnt/nfs-backups` (auto-mounted on access)
+- **Repository**: `/mnt/nfs-backups/${hostname}-restic-repo`
+- **Schedule**: Twice daily at 02:00 and 14:00
+- **Backup Target**: All of `/home` with smart exclusions
+
+**Retention Policy**
+- Daily: 7 snapshots
+- Weekly: 4 snapshots
+- Monthly: 6 snapshots
+- Yearly: 1 snapshot
+
+**Exclusions**
+Smart exclusions minimize backup size while preserving important data:
+- Cache directories (`.cache`, browser caches)
+- Trash folders (`.local/share/Trash`)
+- Development artifacts (`node_modules`, `.venv`, `__pycache__`)
+- Package caches (`.npm`, `.cargo/registry`, `.rustup`)
+- Large temporary files (`*.iso`, `*.img` in Downloads)
+- Regenerable data (thumbnails, file indexes)
+
+**Security**
+- Repository password stored encrypted in SOPS at `backups/restic/password`
+- Restic provides client-side encryption of all backup data
+- Repository directory permissions set to 700 (root-only)
+- NFS mount uses `nofail` option to prevent boot failures
+
+**Customization**
+Override default backup settings in host configuration:
+```nix
+my.backup = {
+  enable = true;
+  schedule = "03:00,15:00";  # Different times
+  paths = [ "/home" "/etc" ];  # Additional paths
+  exclude = [ "/home/*/custom-exclude" ];  # Custom exclusions
+};
+```
 
 ## Testing Changes
 

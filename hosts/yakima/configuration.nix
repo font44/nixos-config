@@ -15,6 +15,7 @@
   my.networking.enable = true;
   my.desktop.gaming.enable = true;
   my.dev-setup.enable = true;
+  my.backup.enable = true;
 
   sops.defaultSopsFile = ../../secrets/default.yml;
   sops.secrets = {
