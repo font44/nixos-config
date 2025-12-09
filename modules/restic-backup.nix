@@ -60,12 +60,10 @@ in {
       ];
     };
 
-    sops.secrets."backups/restic/password" = {
-      mode = "0400";
-      owner = "root";
-      group = "root";
-    };
+    sops.secrets."backups/restic/password" = {};
 
+    # systemctl status restic-backups-home.service
+    # sudo restic-home ls latest
     services.restic.backups.home = {
       initialize = true;
       repository = repoPath;
@@ -75,13 +73,6 @@ in {
       exclude = cfg.exclude;
 
       pruneOpts = cfg.pruneOpts;
-
-      backupPrepareCommand = ''
-        if ! mountpoint -q ${mountPoint}; then
-          echo "Error: NFS mount ${mountPoint} is not available"
-          exit 1
-        fi
-      '';
     };
 
     systemd.services.restic-backups-home = {
@@ -89,7 +80,6 @@ in {
       # hyphens in path must be escaped as \x2d in systemd unit names
       after = [ "network-online.target" "mnt-nfs\\x2dbackups.mount" ];
       requires = [ "mnt-nfs\\x2dbackups.mount" ];
-      wants = [ "network-online.target" ];
     };
   };
 }
