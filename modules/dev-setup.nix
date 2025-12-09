@@ -23,7 +23,10 @@ in {
   };
 
   config = mkIf cfg.enable {
-    virtualisation.podman.enable = true;
+    virtualisation.podman = {
+      enable = true;
+      dockerCompat = true;
+    };
 
     environment.systemPackages = [
       my-kubernetes-helm
@@ -32,7 +35,9 @@ in {
       age
       ansible
       btop
+      devenv
       dig
+      dnscontrol
       dua
       envsubst
       fluxcd

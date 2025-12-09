@@ -23,6 +23,7 @@
     "wireguard/wg0/peer_psk" = {};
   };
 
+  # sudo systemctl status wg-quick-wg0
   networking.wg-quick.interfaces = {
     wg0 = {
       address = [
