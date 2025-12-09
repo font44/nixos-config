@@ -13,6 +13,7 @@
     ./networking.nix
     ./nix.nix
     ./restic-backup.nix
+    ./server.nix
     ./users.nix
   ];
 }

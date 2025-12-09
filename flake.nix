@@ -29,6 +29,11 @@
 
     flox.url = "github:flox/flox";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
+
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
@@ -54,6 +59,34 @@
             extraGroups = [ "docker" "networkmanager" "podman" ];
           };
         };
+      };
+
+      chicago = lib.mkSystem {
+        hostname = "chicago";
+        system = "x86_64-linux";
+        isServer = true;
+        users = {
+          ketan = {
+            name = "ketan";
+            fullName = "Ketan Vijayvargiya";
+            email = "hi@ketanvijayvargiya.com";
+            hashedPassword = "$y$j9T$k5FwsT0yGXVJwrCdo0Ew//$NlntOgydAMXMX4qLvmID9IBk8p1F4kmJx3TxUMFkIf3";
+            isAdmin = true;
+            sshKeys = [
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGnS3nk+5uL0BE4oGpUf0JBYFNjJOcqLHjtiS3MVFGhM"
+            ];
+          };
+        };
+      };
+    };
+
+    packages.x86_64-linux = {
+      vm-bootstrap-proxmox = inputs.nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        format = "proxmox";
+        modules = [
+          ./hosts/vm-bootstrap.nix
+        ];
       };
     };
   };

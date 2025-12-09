@@ -53,6 +53,11 @@ inputs.nixpkgs.lib.nixosSystem {
       my.users.enable = inputs.nixpkgs.lib.mkDefault true;
     })
 
+    (inputs.nixpkgs.lib.mkIf isServer {
+      my.server.enable = inputs.nixpkgs.lib.mkDefault true;
+      my.users.enable = inputs.nixpkgs.lib.mkDefault true;
+    })
+
     (inputs.nixpkgs.lib.mkIf isAmdGpu {
       my.amd-gpu-support.enable = inputs.nixpkgs.lib.mkDefault true;
     })
