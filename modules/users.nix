@@ -7,6 +7,12 @@ let
 in {
   options.my.users = {
     enable = mkEnableOption "user management";
+    
+    enableHomeManager = mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to enable home-manager for users";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -24,8 +30,8 @@ in {
 
     programs.zsh.enable = true;
 
-    home-manager.users = mapAttrs (name: user: import ../users/user.nix {
+    home-manager.users = mkIf cfg.enableHomeManager (mapAttrs (name: user: import ../users/user.nix {
       inherit (user) name email fullName;
-    }) users;
+    }) users);
   };
 }

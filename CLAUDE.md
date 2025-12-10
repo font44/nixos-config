@@ -182,9 +182,6 @@ Build a minimal bootstrap image (once, reusable for all VMs):
 ```sh
 # Proxmox VMA format
 nix build .#vm-bootstrap-proxmox
-
-# QCOW2 format (for Hetzner, other providers)
-nix build .#vm-bootstrap-qcow2
 ```
 
 The bootstrap image contains:
@@ -198,33 +195,43 @@ The bootstrap image contains:
 1. **Build and upload the bootstrap image** (one-time):
 ```sh
 nix build .#vm-bootstrap-proxmox
-scp result/nixos.vma.zst root@proxmox-host:/var/lib/vz/dump/nixos-bootstrap.vma.zst
+scp result/vzdump-* root@10.0.1.105:/var/lib/vz/dump/
 ```
 
 2. **Create VM from bootstrap image**:
 ```sh
 # On Proxmox host
-qmrestore /var/lib/vz/dump/nixos-bootstrap.vma.zst 100 --storage local-lvm
-qm set 100 --cores 2 --memory 2048 --net0 virtio,bridge=vmbr0
-qm start 100
-```
+qmrestore /var/lib/vz/dump/vzdump-foo 104 --unique true --storage fast-zfs-pool-crypt
+qm set 104 --cores 2 --memory 2048 --net0 virtio,bridge=vmbr0 --name chicago
+qm start 104
 
-3. **Get VM IP** (from Proxmox console or DHCP):
-```sh
 # Wait for VM to boot, then check IP
 qm guest exec 100 -- ip addr show
 ```
 
-4. **Apply full configuration**:
+3. **On the host**:
+```sh
+# Update hardware-configuration.nix
+nixos-generate-config --show-hardware-config
+
+# User key:
+ssh-keygen -t ed25519 -C "ketan@chicago"
+cat .ssh/id_ed25519.pub | ssh-to-age
+cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
+```
+
+4. **Encrypt secrets for the new VM**. Follow instructions in *.sops.yaml* file.
+
+5. **Apply full configuration**:
 ```sh
 # From your development machine
 nixos-rebuild switch --flake .#chicago \
-  --target-host bootstrap@<vm-ip> --use-remote-sudo
+  --target-host ketan@<vm-ip> --use-remote-sudo
 ```
 
 This transforms the minimal bootstrap into the full chicago configuration with all modules, users, packages, and settings.
 
-5. **SSH with real user** (bootstrap user will be removed):
+6. **SSH with real user** (bootstrap user will be removed):
 ```sh
 ssh ketan@<vm-ip>
 ```

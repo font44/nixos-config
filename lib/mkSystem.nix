@@ -30,7 +30,6 @@ inputs.nixpkgs.lib.nixosSystem {
     ../modules
 
     inputs.disko.nixosModules.disko
-    inputs.flox.nixosModules.flox
     inputs.sops-nix.nixosModules.sops
 
     inputs.home-manager.nixosModules.home-manager
@@ -45,17 +44,16 @@ inputs.nixpkgs.lib.nixosSystem {
 
     {
       my.base.enable = inputs.nixpkgs.lib.mkDefault true;
+      my.users.enable = inputs.nixpkgs.lib.mkDefault true;
     }
 
     (inputs.nixpkgs.lib.mkIf isDesktop {
       my.desktop.enable = inputs.nixpkgs.lib.mkDefault true;
       my.home.desktop.enable = inputs.nixpkgs.lib.mkDefault true;
-      my.users.enable = inputs.nixpkgs.lib.mkDefault true;
     })
 
     (inputs.nixpkgs.lib.mkIf isServer {
       my.server.enable = inputs.nixpkgs.lib.mkDefault true;
-      my.users.enable = inputs.nixpkgs.lib.mkDefault true;
     })
 
     (inputs.nixpkgs.lib.mkIf isAmdGpu {

@@ -1,6 +1,10 @@
+# sops updatekeys secrets/default.yml - anytime you change keys.
 keys:
   # cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
-  - &desktop age140mwr39uc7jv0c8qmuxu8cjdv2w2ac0ktfz07huyt5naeph3pf2q503uwl
+  - &chicago age1tfkc4sasc5yhfl6u9hxev759eacd8rw6fy9j99utajg7jaxumq6srmr7gm
+  - &yakima age140mwr39uc7jv0c8qmuxu8cjdv2w2ac0ktfz07huyt5naeph3pf2q503uwl
+  # cat .ssh/id_ed25519.pub | ssh-to-age
+  - &chicago_ketan age18s8m9u69hk3xdjvz7e0c6jmhql2x8k9p98a9nvdy75a9prw7ryfqdp2mh7
   # ssh-to-age -private-key -i priv > ~/.config/sops/age/keys.txt
   # ssh-to-age -i pub
   - &bitwarden age1n93u835nu8nxfetappazpl7ns4h3ys2ehzy624rzs2gp887zff9q96v7e5
@@ -8,5 +12,7 @@ creation_rules:
   - path_regex: secrets/[^/]+\.(yml|json|env|ini)$
     key_groups:
       - age:
-        - *desktop
         - *bitwarden
+        - *chicago
+        - *chicago_ketan
+        - *yakima

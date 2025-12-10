@@ -1,13 +1,6 @@
 {
   description = "Multi-host NixOS configuration";
 
-  nixConfig.extra-substituters = [
-    "https://cache.flox.dev"
-  ];
-  nixConfig.extra-trusted-public-keys = [
-    "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs="
-  ];
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -27,7 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    flox.url = "github:flox/flox";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
 
     nixos-generators = {
