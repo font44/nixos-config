@@ -1,3 +1,8 @@
+# System-level user management module.
+# Creates Unix user accounts and orchestrates home-manager integration.
+# Receives user definitions from flake.nix via specialArgs and imports
+# the user.nix template for each user's home-manager configuration.
+
 { config, lib, pkgs, users ? {}, ... }:
 
 with lib;

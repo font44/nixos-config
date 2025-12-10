@@ -1,3 +1,7 @@
+# Reusable home-manager configuration template for individual users.
+# Takes user parameters (name, email, fullName) and returns home-manager config.
+# Imported by modules/users.nix for each user defined in flake.nix.
+
 { name, email, fullName, ... }@userParams:
 
 { config, lib, pkgs, inputs, ... }:
