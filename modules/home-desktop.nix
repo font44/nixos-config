@@ -1,3 +1,6 @@
+# Shared home-manager configuration for desktop-specific programs.
+# Uses sharedModules to provide GUI applications for all users on desktop hosts.
+
 { config, lib, pkgs, ... }:
 
 with lib;

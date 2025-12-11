@@ -1,3 +1,7 @@
+# Shared home-manager configuration applied to all users system-wide.
+# Uses sharedModules to provide common tools.
+# Contrast with users/user.nix which contains per-user settings.
+
 { config, lib, pkgs, ... }:
 
 with lib;
