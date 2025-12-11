@@ -64,6 +64,47 @@ sudo restic -r /mnt/nfs-backups/yakima-restic-repo restore latest \
   --password-file /run/secrets/backups/restic/password
 ```
 
+### Deployment Workflows
+
+#### Local Deployment (nixos-rebuild)
+Traditional workflow for local development and testing:
+```sh
+# Local rebuild
+sudo nixos-rebuild switch --flake .#yakima
+
+# Remote rebuild
+nixos-rebuild switch --flake .#chicago \
+  --target-host ketan@chicago --use-remote-sudo
+```
+
+#### Automated Deployment (deploy-rs)
+Recommended for production deployments with rollback safety:
+```sh
+# Deploy single host
+deploy .#yakima
+deploy .#chicago
+
+# Deploy all hosts
+deploy
+
+# Validate configuration before deploying
+nix flake check
+
+# Dry run (preview without activating)
+deploy --dry-activate .#chicago
+```
+
+**Deploy-rs Benefits:**
+- Automatic rollback if activation fails
+- Magic rollback if SSH connection is lost
+- Pre-deployment validation checks
+- Remote builds to offload work to target host
+- Deploy multiple hosts in parallel
+
+**When to use which:**
+- **deploy-rs**: Production deployments, multi-host updates, when safety is critical
+- **nixos-rebuild**: Local testing, development iteration, manual control
+
 ## Architecture
 
 ### Modular Structure

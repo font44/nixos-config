@@ -20,6 +20,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
 
     nixos-generators = {
@@ -71,6 +76,30 @@
         };
       };
     };
+
+    deploy.nodes = {
+      yakima = {
+        hostname = "localhost";
+        profiles.system = {
+          user = "root";
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos
+            self.nixosConfigurations.yakima;
+        };
+      };
+
+      chicago = {
+        hostname = "10.0.1.215";
+        profiles.system = {
+          user = "root";
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos
+            self.nixosConfigurations.chicago;
+        };
+      };
+    };
+
+    checks = builtins.mapAttrs (system: deployLib:
+      deployLib.deployChecks self.deploy
+    ) inputs.deploy-rs.lib;
 
     packages.x86_64-linux = {
       vm-bootstrap-proxmox = inputs.nixos-generators.nixosGenerate {
