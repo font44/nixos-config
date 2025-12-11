@@ -41,12 +41,6 @@ in {
         vimAlias = true;
       };
 
-      programs.tmux = {
-        enable = true;
-        mouse = true;
-        historyLimit = 10000;
-      };
-
       programs.zellij = {
         enable = true;
       };
