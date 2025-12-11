@@ -57,11 +57,6 @@ sudo restic -r /mnt/nfs-backups/yakima-restic-repo snapshots \
 # Restore files from latest snapshot
 sudo restic -r /mnt/nfs-backups/yakima-restic-repo restore latest \
   --target /tmp/restore --password-file /run/secrets/backups/restic/password
-
-# Restore specific files
-sudo restic -r /mnt/nfs-backups/yakima-restic-repo restore latest \
-  --target /tmp/restore --include /home/user/Documents \
-  --password-file /run/secrets/backups/restic/password
 ```
 
 ### Deployment Workflows
@@ -94,16 +89,9 @@ nix flake check
 deploy --dry-activate .#chicago
 ```
 
-**Deploy-rs Benefits:**
-- Automatic rollback if activation fails
-- Magic rollback if SSH connection is lost
-- Pre-deployment validation checks
-- Remote builds to offload work to target host
-- Deploy multiple hosts in parallel
-
 **When to use which:**
-- **deploy-rs**: Production deployments, multi-host updates, when safety is critical
-- **nixos-rebuild**: Local testing, development iteration, manual control
+- **deploy-rs**: Production (automatic rollback, validation, parallel deploys)
+- **nixos-rebuild**: Local testing and development
 
 ## Architecture
 
@@ -131,19 +119,7 @@ The configuration uses a multi-layer architecture:
 - `modules/default.nix`: Imports all available modules
 - Individual modules define `options.my.${name}` for configuration
 - All modules use `mkIf cfg.enable` for conditional activation
-- Available modules:
-  - `base.nix`: Core locale configuration (always enabled by default)
-  - `nix.nix`: Nix daemon and flake settings
-  - `networking.nix`: Network configuration with NetworkManager and OpenSSH
-  - `users.nix`: User account management receiving users from specialArgs, handles both system users and home-manager integration
-  - `desktop.nix`: KDE Plasma desktop environment
-  - `gaming.nix`: Gaming-related packages and configurations
-  - `local-llm.nix`: Ollama and Open WebUI services
-  - `dev-setup.nix`: Development tools and environments
-  - `home.nix`: Base home-manager configurations
-  - `home-desktop.nix`: Desktop-specific home-manager settings
-  - `amd-gpu.nix`: AMD GPU support
-  - `restic-backup.nix`: Automated encrypted backups to NFS server
+- Available modules: base, nix, networking, users, desktop (KDE), gaming, local-llm (Ollama), dev-setup, home, home-desktop, amd-gpu, restic-backup
 
 **Host Layer (hosts/${hostname}/)**
 - `configuration.nix`: Host-specific settings (timezone, services, system configuration)
@@ -218,63 +194,33 @@ nixosConfigurations.newhostname = lib.mkSystem {
 
 ### Building VM Bootstrap Images
 
-Build a minimal bootstrap image (once, reusable for all VMs):
-
 ```sh
-# Proxmox VMA format
-nix build .#vm-bootstrap-proxmox
+nix build .#vm-bootstrap-proxmox  # Proxmox VMA format
+nix build .#vm-bootstrap-qcow2    # Other providers
 ```
 
-The bootstrap image contains:
-- Minimal server configuration (QEMU guest, auto-grow, serial console)
-- Single 'bootstrap' user with SSH key
-- Passwordless sudo enabled
-- Just enough to SSH in and run remote rebuild
+Bootstrap contains minimal server config with 'bootstrap' user for SSH access.
 
 ### Deploying to Proxmox
 
-1. **Build and upload the bootstrap image** (one-time):
+1. Build and upload bootstrap:
 ```sh
 nix build .#vm-bootstrap-proxmox
 scp result/vzdump-* root@10.0.1.105:/var/lib/vz/dump/
 ```
 
-2. **Create VM from bootstrap image**:
+2. Create and start VM on Proxmox host:
 ```sh
-# On Proxmox host
 qmrestore /var/lib/vz/dump/vzdump-foo 104 --unique true --storage fast-zfs-pool-crypt
 qm set 104 --cores 2 --memory 2048 --net0 virtio,bridge=vmbr0 --name chicago
 qm start 104
-
-# Wait for VM to boot, then check IP
-qm guest exec 100 -- ip addr show
 ```
 
-3. **On the host**:
+3. Generate hardware config, age keys, encrypt secrets (see .sops.yaml)
+
+4. Apply full configuration:
 ```sh
-# Update hardware-configuration.nix
-nixos-generate-config --show-hardware-config
-
-# User key:
-ssh-keygen -t ed25519 -C "ketan@chicago"
-cat .ssh/id_ed25519.pub | ssh-to-age
-cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
-```
-
-4. **Encrypt secrets for the new VM**. Follow instructions in *.sops.yaml* file.
-
-5. **Apply full configuration**:
-```sh
-# From your development machine
-nixos-rebuild switch --flake .#chicago \
-  --target-host ketan@<vm-ip> --use-remote-sudo
-```
-
-This transforms the minimal bootstrap into the full chicago configuration with all modules, users, packages, and settings.
-
-6. **SSH with real user** (bootstrap user will be removed):
-```sh
-ssh ketan@<vm-ip>
+nixos-rebuild switch --flake .#chicago --target-host ketan@<vm-ip> --use-remote-sudo
 ```
 
 ### Deploying to Other Providers
@@ -287,33 +233,14 @@ nix build .#vm-bootstrap-qcow2
 nixos-rebuild switch --flake .#hostname --target-host bootstrap@<vm-ip> --use-remote-sudo
 ```
 
-### Two-Stage Deployment Benefits
-
-1. **Build once, use many times**: Same bootstrap image for all VMs
-2. **Faster iterations**: Modify host config and just run remote rebuild
-3. **Smaller images**: Bootstrap is minimal (~500MB), full packages installed on rebuild
-4. **Standard workflow**: Same rebuild process for initial setup and updates
 
 ### Server Module
 
-The `my.server.enable` module provides VM-optimized configuration:
-- QEMU guest agent for provider integration
-- Automatic partition resizing on first boot
-- Serial console support
-- Configurable boot loader (GRUB or systemd-boot)
-- Works with any VM provider (Proxmox, Hetzner, Digital Ocean, etc.)
-
-Automatically enabled when `isServer = true` in flake.nix.
+`my.server.enable` provides VM-optimized config (QEMU guest agent, auto-resize, serial console). Automatically enabled when `isServer = true` in flake.nix.
 
 ### Disk Configuration (Disko)
 
-The current host uses LUKS encryption on btrfs with these subvolumes:
-- `/root` → `/`
-- `/home` → `/home`
-- `/nix` → `/nix`
-- `/swap` → `/.swap` (16GB swapfile)
-
-All subvolumes use `compress=zstd` and `noatime` mount options. Disko configuration is in `hosts/${hostname}/disko.nix`.
+LUKS encryption on btrfs with subvolumes for `/`, `/home`, `/nix`, and swap. Configuration in `hosts/${hostname}/disko.nix`.
 
 ### Secret Management
 
@@ -331,72 +258,26 @@ sops secrets/default.yml
 
 ### User Management
 
-Users are defined in `flake.nix` as a parameter to `lib.mkSystem`:
-```nix
-nixosConfigurations.yakima = lib.mkSystem {
-  hostname = "yakima";
-  users = {
-    ketan = {
-      name = "ketan";
-      fullName = "Ketan Vijayvargiya";
-      email = "hi@ketanvijayvargiya.com";
-      hashedPassword = "$y$...";
-      isAdmin = true;
-      sshKeys = [ "ssh-ed25519 ..." ];
-      extraGroups = [ "docker" "networkmanager" "podman" ];
-    };
-  };
-};
-```
+Users defined in `flake.nix` as parameter to `lib.mkSystem`. The users attrset is passed through specialArgs. `modules/users.nix` creates system users and sets up home-manager integration using templates from `users/user.nix`.
 
-The users attrset is passed through specialArgs to all modules. The `modules/users.nix` module:
-- Creates system users with the provided configuration
-- Sets up home-manager integration using templates from `users/user.nix`
-- Handles both system-level user accounts and home-manager configurations in one place
-
-Note: OpenSSH is configured with `PasswordAuthentication = false` (key-based auth only). User passwords work for local/console login and sudo.
+Note: SSH key-based auth only. Passwords work for local/console login and sudo.
 
 ### Backup Configuration
 
-Automated backups are configured using Restic with the following setup:
+Restic backups to NFS server (10.0.1.40) at `/mnt/nfs-backups/${hostname}-restic-repo`.
+- Module: `modules/restic-backup.nix` (enabled via `my.backup.enable`)
+- Schedule: Twice daily at 02:00 and 14:00
+- Target: `/home` with exclusions for caches, trash, dev artifacts, package caches
+- Retention: 7 daily, 4 weekly, 6 monthly, 1 yearly
+- Password: SOPS encrypted at `backups/restic/password`
 
-**Configuration**
-- **Module**: `modules/restic-backup.nix` (enabled via `my.backup.enable`)
-- **NFS Server**: 10.0.1.40 at `/var/nfs/shared/Backups`
-- **Mount Point**: `/mnt/nfs-backups` (auto-mounted on access)
-- **Repository**: `/mnt/nfs-backups/${hostname}-restic-repo`
-- **Schedule**: Twice daily at 02:00 and 14:00
-- **Backup Target**: All of `/home` with smart exclusions
-
-**Retention Policy**
-- Daily: 7 snapshots
-- Weekly: 4 snapshots
-- Monthly: 6 snapshots
-- Yearly: 1 snapshot
-
-**Exclusions**
-Smart exclusions minimize backup size while preserving important data:
-- Cache directories (`.cache`, browser caches)
-- Trash folders (`.local/share/Trash`)
-- Development artifacts (`node_modules`, `.venv`, `__pycache__`)
-- Package caches (`.npm`, `.cargo/registry`, `.rustup`)
-- Large temporary files (`*.iso`, `*.img` in Downloads)
-- Regenerable data (thumbnails, file indexes)
-
-**Security**
-- Repository password stored encrypted in SOPS at `backups/restic/password`
-- Restic provides client-side encryption of all backup data
-- Repository directory permissions set to 700 (root-only)
-- NFS mount uses `nofail` option to prevent boot failures
-
-**Customization**
-Override default backup settings in host configuration:
+Override in host config:
 ```nix
 my.backup = {
   enable = true;
-  schedule = "03:00,15:00";  # Different times
-  paths = [ "/home" "/etc" ];  # Additional paths
-  exclude = [ "/home/*/custom-exclude" ];  # Custom exclusions
+  schedule = "03:00,15:00";
+  paths = [ "/home" "/etc" ];
+  exclude = [ "/home/*/custom-exclude" ];
 };
 ```
 
