@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgs-unstable, ... }:
+{ config, inputs, lib, pkgs, pkgs-unstable, ... }:
 
 with lib;
 
@@ -27,7 +27,9 @@ in {
       zoom-us
     ] ++ (with pkgs-unstable; [
       obsidian
-    ]);
+    ]) ++ [
+      inputs.deploy-rs.packages.${pkgs.system}.deploy-rs
+    ];
 
     services.pulseaudio.enable = false;
     services.pipewire = {
