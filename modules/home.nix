@@ -44,6 +44,15 @@ in {
       programs.zellij = {
         enable = true;
       };
+
+      programs.git.extraConfig = {
+        init.defaultBranch = "main";
+      };
+
+      home.file = {
+        ".step/certs/root_ca.crt".source = ../static/stepca/root_ca.crt;
+        ".step/config/defaults.json".source = ../static/stepca/config.json;
+      };
     }];
   };
 }

@@ -14,9 +14,6 @@
     enable = true;
     userName = fullName;
     userEmail = email;
-    extraConfig = {
-      init.defaultBranch = "main";
-    };
   };
 
   home.sessionVariables = {
@@ -39,11 +36,6 @@
       "container_registry/gitlab/username" = {};
       "container_registry/gitlab/token" = {};
     };
-  };
-
-  home.file = {
-    ".step/certs/root_ca.crt".source = ../static/stepca/root_ca.crt;
-    ".step/config/defaults.json".source = ../static/stepca/config.json;
   };
 
   xdg.configFile."crush/crush.json".source = ../static/crush.conf.json;
