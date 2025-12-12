@@ -201,7 +201,17 @@ nix build .#vm-bootstrap-qcow2    # Other providers
 
 Bootstrap contains minimal server config with 'bootstrap' user for SSH access.
 
+### Building LXC Bootstrap Images
+
+```sh
+nix build .#lxc-bootstrap-proxmox
+```
+
+Minimal LXC template with 'ketan' user, SSH access, and disabled sandbox (required for LXC). See https://nixos.wiki/wiki/Proxmox_Linux_Container
+
 ### Deploying to Proxmox
+
+#### Deploying VMs
 
 1. Build and upload bootstrap:
 ```sh
@@ -221,6 +231,30 @@ qm start 104
 4. Apply full configuration:
 ```sh
 nixos-rebuild switch --flake .#chicago --target-host ketan@<vm-ip> --use-remote-sudo
+```
+
+#### Deploying LXCs
+
+1. Build and upload template:
+```sh
+nix build .#lxc-bootstrap-proxmox
+scp result/*.tar.xz root@10.0.1.105:/var/lib/vz/template/cache/
+```
+
+2. Create and start container on Proxmox host (use CLI, GUI unreliable):
+```sh
+pct create 200 /var/lib/vz/template/cache/nixos-*.tar.xz \
+  --hostname chicago-lxc --memory 2048 --cores 2 \
+  --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+  --storage fast-zfs-pool-crypt --rootfs fast-zfs-pool-crypt:8 \
+  --unprivileged 0 --features nesting=1
+pct start 200
+```
+
+3. Find IP and apply configuration:
+```sh
+pct exec 200 -- ip addr show
+nixos-rebuild switch --flake .#chicago --target-host ketan@<container-ip> --use-remote-sudo
 ```
 
 ### Deploying to Other Providers

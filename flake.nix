@@ -109,6 +109,14 @@
           ./hosts/vm-bootstrap.nix
         ];
       };
+
+      lxc-bootstrap-proxmox = inputs.nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        format = "proxmox-lxc";
+        modules = [
+          ./hosts/lxc-bootstrap.nix
+        ];
+      };
     };
   };
 }
