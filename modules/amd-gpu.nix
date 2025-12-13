@@ -10,8 +10,6 @@ in {
   };
 
   config = mkIf cfg.enable {
-    nixpkgs.config.rocmSupport = true;
-
     environment.systemPackages = [ pkgs.nvtopPackages.amd ];
 
     hardware.graphics = {

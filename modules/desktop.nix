@@ -16,7 +16,7 @@ in {
     programs.partition-manager.enable = true;
     programs.localsend.enable = true;
 
-    nixpkgs.config.permittedInsecurePackages = [ "ventoy-qt5-1.1.05" ];
+    nixpkgs.config.permittedInsecurePackages = [ "ventoy-qt5-1.1.07" ];
     environment.systemPackages = with pkgs; [
       bitwarden-desktop
       libreoffice

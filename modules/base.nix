@@ -1,4 +1,4 @@
-{ config, inputs, lib, ... }:
+{ config, inputs, lib, pkgs, ... }:
 
 with lib;
 
@@ -34,6 +34,8 @@ in {
 
     my.networking.enable = inputs.nixpkgs.lib.mkDefault true;
     my.nix.enable = inputs.nixpkgs.lib.mkDefault true;
+
+    environment.systemPackages = with pkgs; [ ssh-to-age ];
 
     time.timeZone = lib.mkDefault "America/Los_Angeles";
   };

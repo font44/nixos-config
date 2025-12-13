@@ -45,7 +45,7 @@ in {
         enable = true;
       };
 
-      programs.git.extraConfig = {
+      programs.git.settings = {
         init.defaultBranch = "main";
       };
 

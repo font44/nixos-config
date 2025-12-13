@@ -46,7 +46,6 @@ in {
       ncdu
       openssl
       sops
-      ssh-to-age
       step-cli
       tree
     ]) ++ (with pkgs-unstable; [

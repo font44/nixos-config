@@ -12,8 +12,8 @@
 
   programs.git = {
     enable = true;
-    userName = fullName;
-    userEmail = email;
+    settings.user.name = fullName;
+    settings.user.email = email;
   };
 
   home.sessionVariables = {
