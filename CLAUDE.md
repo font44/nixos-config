@@ -238,7 +238,7 @@ nixos-rebuild switch --flake .#chicago --target-host ketan@<vm-ip> --use-remote-
 1. Build and upload template:
 ```sh
 nix build .#lxc-bootstrap-proxmox
-scp result/*.tar.xz root@10.0.1.105:/var/lib/vz/template/cache/
+scp result/tarball/*.tar.xz root@10.0.1.105:/var/lib/vz/template/cache/
 ```
 
 2. Create and start container on Proxmox host (use CLI, GUI unreliable):
