@@ -29,6 +29,7 @@ in {
       LC_TIME = cfg.locale;
     };
 
+    my.networking.enable = inputs.nixpkgs.lib.mkDefault true;
     my.nix.enable = inputs.nixpkgs.lib.mkDefault true;
   };
 }

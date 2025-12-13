@@ -1,10 +1,6 @@
 { config, inputs, pkgs, pkgs-unstable, ... }:
 
 {
-  imports = [
-    ./hardware-configuration.nix
-  ];
-
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -12,7 +8,6 @@
 
   time.timeZone = "America/Los_Angeles";
 
-  my.networking.enable = true;
   my.desktop.gaming.enable = true;
   my.dev-setup.enable = true;
   my.backup.enable = true;
