@@ -34,5 +34,7 @@ in {
 
     my.networking.enable = inputs.nixpkgs.lib.mkDefault true;
     my.nix.enable = inputs.nixpkgs.lib.mkDefault true;
+
+    time.timeZone = lib.mkDefault "America/Los_Angeles";
   };
 }

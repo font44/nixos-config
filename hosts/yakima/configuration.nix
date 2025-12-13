@@ -6,8 +6,6 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "usbcore.autosuspend=-1" ];
 
-  time.timeZone = "America/Los_Angeles";
-
   my.desktop.gaming.enable = true;
   my.dev-setup.enable = true;
   my.backup.enable = true;

@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  time.timeZone = "America/Los_Angeles";
-
   my.dev-setup.enable = true;
 
   services.nfs.server = {

@@ -3,8 +3,6 @@
 {
   my.networking.enable = true;
 
-  time.timeZone = "America/Los_Angeles";
-
   services = {
     jellyfin = {
       enable = true;
