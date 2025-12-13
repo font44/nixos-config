@@ -5,6 +5,7 @@
 , users ? {}
 , isDesktop ? false
 , isServer ? false
+, isProxmoxLxc ? false
 , isAmdGpu ? false
 }:
 
@@ -54,6 +55,10 @@ inputs.nixpkgs.lib.nixosSystem {
 
     (inputs.nixpkgs.lib.mkIf isServer {
       my.server.enable = inputs.nixpkgs.lib.mkDefault true;
+    })
+
+    (inputs.nixpkgs.lib.mkIf isProxmoxLxc {
+      my.proxmoxLxc.enable = inputs.nixpkgs.lib.mkDefault true;
     })
 
     (inputs.nixpkgs.lib.mkIf isAmdGpu {

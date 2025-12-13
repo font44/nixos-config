@@ -4,6 +4,7 @@
   imports = [
     ./amd-gpu.nix
     ./base.nix
+    ./proxmox-lxc.nix
     ./desktop.nix
     ./dev-setup.nix
     ./gaming.nix

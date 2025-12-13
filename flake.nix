@@ -75,6 +75,24 @@
           };
         };
       };
+
+      boulder = lib.mkSystem {
+        hostname = "boulder";
+        system = "x86_64-linux";
+        isProxmoxLxc = true;
+        users = {
+          ketan = {
+            name = "ketan";
+            fullName = "Ketan Vijayvargiya";
+            email = "hi@ketanvijayvargiya.com";
+            hashedPassword = "$y$j9T$k5FwsT0yGXVJwrCdo0Ew//$NlntOgydAMXMX4qLvmID9IBk8p1F4kmJx3TxUMFkIf3";
+            isAdmin = true;
+            sshKeys = [
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGnS3nk+5uL0BE4oGpUf0JBYFNjJOcqLHjtiS3MVFGhM"
+            ];
+          };
+        };
+      };
     };
 
     deploy.nodes = {
@@ -93,6 +111,15 @@
           user = "root";
           path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos
             self.nixosConfigurations.chicago;
+        };
+      };
+
+      boulder = {
+        hostname = "10.0.1.238";
+        profiles.system = {
+          user = "root";
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos
+            self.nixosConfigurations.boulder;
         };
       };
     };

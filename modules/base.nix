@@ -29,6 +29,9 @@ in {
       LC_TIME = cfg.locale;
     };
 
+    # See: https://discourse.nixos.org/t/conflicting-bootloader-settings-in-virtualisation-proxmox-lxc-nix/63532/2
+    proxmoxLXC.enable = lib.mkDefault false;
+
     my.networking.enable = inputs.nixpkgs.lib.mkDefault true;
     my.nix.enable = inputs.nixpkgs.lib.mkDefault true;
   };
