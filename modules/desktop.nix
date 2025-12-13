@@ -28,7 +28,7 @@ in {
     ] ++ (with pkgs-unstable; [
       obsidian
     ]) ++ [
-      inputs.deploy-rs.packages.${pkgs.system}.deploy-rs
+      inputs.deploy-rs.packages.${pkgs.stdenv.hostPlatform.system}.deploy-rs
     ];
 
     services.pulseaudio.enable = false;

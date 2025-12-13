@@ -51,7 +51,7 @@ in {
     ]) ++ (with pkgs-unstable; [
       kubectl
       talosctl
-    ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.system}; [
+    ]) ++ (with inputs.nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system}; [
       claude-code
       crush
       gemini-cli

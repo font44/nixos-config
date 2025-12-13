@@ -4,9 +4,10 @@ keys:
   - &boulder age165jywuq6vqkvjfuse36hhhy83jzz4fxkt40zud9zdzffdprk3ddqyyppku
   - &chicago age1tfkc4sasc5yhfl6u9hxev759eacd8rw6fy9j99utajg7jaxumq6srmr7gm
   - &yakima age140mwr39uc7jv0c8qmuxu8cjdv2w2ac0ktfz07huyt5naeph3pf2q503uwl
-  # cat .ssh/id_ed25519.pub | ssh-to-age
+  # cat ~/.ssh/id_ed25519.pub | ssh-to-age
   - &boulder_ketan age1lezgywcas2a76uk5tzxfka8mtzmywfllnnms3wvdx3tpzn8rvfqqjh4klc
   - &chicago_ketan age18s8m9u69hk3xdjvz7e0c6jmhql2x8k9p98a9nvdy75a9prw7ryfqdp2mh7
+  - &yakima_ketan age1mrc9vyfm2220x3jnwsfy96p2wk6d9pgm3pak4wa2gxvxy4nljumqpkd058
   # ssh-to-age -private-key -i priv > ~/.config/sops/age/keys.txt
   # ssh-to-age -i pub
   - &bitwarden age1n93u835nu8nxfetappazpl7ns4h3ys2ehzy624rzs2gp887zff9q96v7e5
@@ -20,3 +21,4 @@ creation_rules:
         - *chicago
         - *chicago_ketan
         - *yakima
+        - *yakima_ketan
